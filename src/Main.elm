@@ -2,47 +2,50 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, id, style)
+{-
+    Local Imports
+-}
 import Styles exposing (..)
+import SwankyB.Main as SB exposing (..)
 
-import SwankyB.Main exposing (..)
 
--- styles
+-- MODEL 
 
-bodstyle : Style 
-bodstyle = [ "display" => "flex"
-           , "flex-direction" => "column"
-           , "width" => "100%"
-           , "height" => "100%"
-           , "justify-content" => "center"
-           , "align-items" => "center"
-           ]
--- model 
 type alias Model =
-    { swanky: SwankyB.Main.Model
+    { swanky: SB.Model
     }
+
 
 type Msg 
     = NoOp 
-    | SwankyB SwankyB.Main.Msg  
+    | SwankyB SB.Msg  
 
--- init 
+
+-- INIT
+
 init : (Model, Cmd Msg)
 init = 
     let 
-        (swankybModel,msg) = SwankyB.Main.init 
+        (swankybModel,msg) = SB.init 
     in
         {swanky = swankybModel } ! [Cmd.map SwankyB msg]
 
--- view
+
+
+-- VIEW
+
 view : Model -> Html Msg 
 view model =
     
     div [style bodstyle] [ div [ ] [text "A Contrived Example"] 
            -- We html map the results of calling the child's view with the child's model
            -- using the appropriate Msg constructor 
-           , ( Html.map SwankyB (SwankyB.Main.view model.swanky) )
+           , ( Html.map SwankyB (SB.view model.swanky) )
            ]
--- update
+
+
+
+-- UPDATE
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = 
@@ -53,16 +56,22 @@ update msg model =
         SwankyB swmsg ->
              let
                 (swmodel, cmd) =
-          SwankyB.Main.update swmsg model.swanky
+          SB.update swmsg model.swanky
       in
         { model | swanky = swmodel } ! [ Cmd.map SwankyB cmd ]
--- subscriptions
+
+
+-- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg 
 subscriptions model = 
-    Sub.map SwankyB (SwankyB.Main.subscriptions model.swanky)
+    -- lets map over Sub SB.Msg transforming it into 
+    -- Sub Msg (where Msg is SwankyB SB.Msg)
+    Sub.map SwankyB (SB.subscriptions model.swanky)
 
--- main
+
+-- MAIN
+
 main : Program Never Model Msg
 main =
     Html.program 
@@ -72,3 +81,15 @@ main =
     , subscriptions = subscriptions
     }
 
+
+
+-- STYLES
+
+bodstyle : Style 
+bodstyle = [ "display" => "flex"
+           , "flex-direction" => "column"
+           , "width" => "100%"
+           , "height" => "100%"
+           , "justify-content" => "center"
+           , "align-items" => "center"
+           ]
